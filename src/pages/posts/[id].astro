@@ -1,41 +1,140 @@
 ---
-import { Marked } from 'marked';
-import { markedHighlight } from 'marked-highlight';
-import Prism from 'prismjs'
-import loadLanguages from 'prismjs/components/';
-loadLanguages(['py', 'ts']); // TODO: get these values from a remote config
+import { Marked } from "marked";
+import { markedHighlight } from "marked-highlight";
+import Prism from "prismjs";
+import loadLanguages from "prismjs/components/";
+loadLanguages(["py", "ts", "go", "bash", "sql", "yaml", "json", "hcl"]); // TODO: get these values from a remote config
 
 import Layout from "@/layouts/Layout.astro";
 import fetchApi from "@/lib/fetch-api";
+import { readingTime } from "@/lib/log";
+import formatDate from "@/utils/formatDate";
+import presentation from "@/data/presentation";
 import type Post from "@/interfaces/post";
 
-import formatDate from "@/utils/formatDate";
-
 const { id } = Astro.params;
-const post: Post = await fetchApi<Post>({
-    endpoint: `posts/${id}`,
-  });
+
+const post: Post | undefined = await fetchApi<Post>({ endpoint: `posts/${id}` });
+if (!post || !post.content) {
+  return new Response("Post not found", { status: 404 });
+}
+
+// Neighbours for the older/newer links (same list the Posts page shows).
+const allPosts: Post[] = await fetchApi<Post[]>({
+  endpoint: "posts",
+  wrappedByKey: "data",
+  query: { sort: ["publishedAt:desc"] },
+  defaultReturn: [],
+});
+const position = allPosts.findIndex((p) => String(p.id) === String(post.id));
+const newer = position > 0 ? allPosts[position - 1] : undefined;
+const older = position >= 0 ? allPosts[position + 1] : undefined;
+
+// Markdown → HTML. Level-2 headings get ids + "01, 02…" numbers and feed the TOC.
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/<[^>]+>/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
+const toc: { id: string; text: string; number: string }[] = [];
+const usedIds = new Set<string>();
 
 const marked = new Marked(
   markedHighlight({
-    langPrefix: 'language-',
+    langPrefix: "language-",
     highlight(code, lang) {
-      return Prism.highlight(code, Prism.languages[lang], lang);
-    }
-  })
+      const grammar = Prism.languages[lang];
+      return grammar ? Prism.highlight(code, grammar, lang) : code;
+    },
+  }),
 );
-const articleContent = marked.parse(post.content)
+
+marked.use({
+  renderer: {
+    heading(text, level, raw) {
+      if (level !== 2) return false;
+      let slug = slugify(raw) || `section-${toc.length + 1}`;
+      while (usedIds.has(slug)) slug += "-x";
+      usedIds.add(slug);
+      const number = String(toc.length + 1).padStart(2, "0");
+      toc.push({ id: slug, text: text.replace(/<[^>]+>/g, ""), number });
+      return `<h2 id="${slug}"><span class="section-number" aria-hidden="true">${number}</span>${text}</h2>`;
+    },
+  },
+});
+
+const articleContent = await marked.parse(post.content);
+const minutes = readingTime(post.content);
+const published = formatDate(new Date(post.published_at));
 ---
 
-<Layout title={post.title} description={post.description}>
-  <main class="post mx-auto flex w-full max-w-prose flex-col gap-4">
-    <header role="presentation">
-      <h1 class="text-md">
-        {post.title} - {formatDate(new Date(post.published_at))}
-      </h1>
-      <p class="italic">{post.description}</p>
-    </header>
+<Layout title={post.title} description={post.description} og={{ type: "article" }}>
+  <a href="/posts" class="label inline-flex min-h-[44px] items-center text-muted hover:text-accent">
+    ← All writing
+  </a>
 
-    <article set:html={articleContent} />
-  </main>
+  <header class="border-b-2 border-fg pb-10 pt-6">
+    <p class="label mb-4 text-accent">
+      commit · {published}{minutes ? ` · ${minutes} min read` : ""}
+    </p>
+    <h1 class="display max-w-[16ch] text-[clamp(48px,8vw,104px)] tracking-[-0.035em]">
+      {post.title}
+    </h1>
+    {post.description && <p class="mt-6 max-w-[56ch] text-[21px] font-semibold">{post.description}</p>}
+  </header>
+
+  <div class="flex flex-wrap gap-12 pb-[72px] pt-12">
+    {
+      toc.length > 1 && (
+        <nav aria-label="On this page" class="label min-w-0 flex-[1_1_220px] text-[13px] tracking-[0.04em]">
+          <p class="mb-3 text-muted">On this page</p>
+          <ol role="list" class="border-l-2 border-fg">
+            {toc.map((item) => (
+              <li>
+                <a href={`#${item.id}`} class="flex gap-2.5 py-2.5 pl-4 hover:text-accent">
+                  <span class="text-muted">{item.number}</span>
+                  <span>{item.text}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )
+    }
+
+    <article class="post min-w-0 max-w-[700px] flex-[999_1_620px]" set:html={articleContent} />
+  </div>
+
+  {
+    (older || newer) && (
+      <nav aria-label="More posts" class="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-x-12 border-t-2 border-fg">
+        {older ? (
+          <a href={`/posts/${older.id}`} class="block py-8 hover:text-accent">
+            <span class="label block text-muted">← HEAD~1 · Older</span>
+            <span class="display mt-2 block text-[32px] leading-none">{older.title}</span>
+          </a>
+        ) : (
+          <span />
+        )}
+        {newer && (
+          <a href={`/posts/${newer.id}`} class="block py-8 text-right hover:text-accent">
+            <span class="label block text-muted">Newer · HEAD →</span>
+            <span class="display mt-2 block text-[32px] leading-none">{newer.title}</span>
+          </a>
+        )}
+      </nav>
+    )
+  }
+
+  <section
+    aria-label="Reply"
+    class="mb-12 flex flex-wrap items-center justify-between gap-4 bg-accent p-8 text-on-accent"
+  >
+    <p class="display text-[30px] leading-none">Thoughts, fixes, disagreements?</p>
+    <a href={`mailto:${presentation.mail}`} class="border-b-2 border-on-accent py-3 font-mono text-sm">
+      {presentation.mail}
+    </a>
+  </section>
 </Layout>

@@ -4,27 +4,48 @@ type Social = {
 };
 
 type Presentation = {
+  name: string;
   mail: string;
-  title: string;
-  description: string;
+  role: string;
+  /** Hero headline — one line per entry; `accent` marks the highlighted line. */
+  headline: { text: string; accent?: boolean }[];
+  intro: string;
+  sandbox: string;
+  stack: { label: string; value: string }[];
   socials: Social[];
-  profile?: string;
+  /** Static entries at the bottom of the home log (oldest last). */
+  milestones: { date: string; title: string; description: string; tags: string[] }[];
 };
 
 const presentation: Presentation = {
+  name: "Roy",
   mail: "yavurb@gmail.com",
-  title: "Hi, I’m Roy 🐙",
-  profile: "https://cdn.yurb.dev/profile-0a6496c5-c426-453d-9577-599903002043.webp",
-  description:
-    "I'm a backend developer who is passionate about building software. I'm also delving into technical writing, and thus, I use this website as my own personal blog to share my learnings and the things I know. In fact, this website is my sandbox, so expect to see a lot of bugs and experimental features. Not because I have nowhere to put them (I don't), but because I truly believe that experimenting and messing things around is the best way for me to become a great SWE. I mean, that is what software is all about, right?",
+  role: "Backend developer",
+  headline: [
+    { text: "Roy builds" },
+    { text: "backends", accent: true },
+    { text: "in public" },
+  ],
+  intro:
+    "Backend developer. Everything I ship, break, and learn lands in the log below.",
+  sandbox:
+    "This site is my sandbox — expect experiments and the odd bug, on purpose.",
+  stack: [
+    { label: "Stack", value: "Go · Python · PostgreSQL" },
+    { label: "Infra", value: "Terraform · AWS · GCP" },
+  ],
   socials: [
+    { label: "GitHub", link: "https://github.com/yavurb" },
+    { label: "X", link: "https://x.com/yurb_" },
+    { label: "Bento", link: "https://bento.me/yurb" },
+  ],
+  milestones: [
     {
-      label: "Bento",
-      link: "https://bento.me/yurb",
-    },
-    {
-      label: "Github",
-      link: "https://github.com/yavurb",
+      // TODO(roy): confirm the real launch date — this is a placeholder.
+      date: "2023-10-26",
+      title: "yurb.dev v1",
+      description: "The sandbox opens on Astro. Bugs included.",
+      tags: ["astro"],
     },
   ],
 };

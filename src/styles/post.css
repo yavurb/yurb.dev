@@ -1,36 +1,93 @@
-.post p {
-  @apply leading-7;
+/* Article body — markdown rendered from the API, styled for the "Index log" design. */
+
+.post {
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.post > * + * {
+  margin-top: 1.5rem;
 }
 
 .post h2 {
-  @apply mt-6 text-3xl text-neutral-100;
+  @apply mt-12 text-[36px] uppercase leading-none tracking-[-0.03em] text-fg;
+  font-weight: 800;
+  font-stretch: 75%;
+}
+
+.post h2 .section-number {
+  @apply mb-2 block font-mono text-[13px] font-medium tracking-[0.06em] text-accent;
 }
 
 .post h3 {
-  @apply mt-4 text-xl text-neutral-100;
+  @apply mt-10 text-2xl font-semibold text-fg;
 }
 
-.post hr {
-  @apply mt-4 mb-4
+.post h4 {
+  @apply mt-8 font-mono text-sm uppercase tracking-[0.06em] text-muted;
 }
 
 .post a {
-  @apply text-neutral-100 underline;
+  @apply border-b-2 border-accent text-fg hover:text-accent;
 }
 
+.post strong {
+  @apply font-semibold text-fg;
+}
+
+.post ul,
+.post ol {
+  @apply pl-6;
+}
 .post ul {
-  @apply list-disc;
+  list-style: square;
+}
+.post ol {
+  list-style: decimal;
+}
+.post li + li {
+  @apply mt-2;
+}
+.post li::marker {
+  color: rgb(var(--accent));
 }
 
+.post hr {
+  @apply my-12 border-t-2 border-fg;
+}
+
+/* Pull-quote style: thick accent bar, bold condensed text. */
 .post blockquote {
-  @apply flex flex-row gap-2 before:block before:h-auto before:w-1 before:max-w-[1px] before:bg-red-400 before:content-[''];
+  @apply border-l-[6px] border-accent pl-6 text-xl font-semibold text-fg;
+}
+.post blockquote p {
+  margin: 0;
 }
 
+/* Inline code */
+.post :not(pre) > code {
+  @apply bg-inline-code px-1.5 py-0.5 font-mono text-[15px];
+}
+
+/* Code blocks */
 .post pre {
-  @apply p-4;
-  @apply overflow-x-auto
+  @apply overflow-x-auto border-2 border-code-border bg-code-bg p-5 text-code-fg;
+}
+.post pre > code {
+  @apply bg-transparent p-0;
 }
 
-.post pre > code {
-  @apply bg-transparent;
+/* Tables scroll inside their own box on small screens */
+.post table {
+  @apply block w-full overflow-x-auto border-collapse text-left text-base;
+}
+.post th {
+  @apply border-b-2 border-fg py-3 pr-4 font-mono text-xs font-medium uppercase tracking-[0.06em] text-muted;
+}
+.post td {
+  @apply border-b border-rule py-3 pr-4 align-top;
+}
+
+.post img {
+  @apply border-2 border-fg;
 }

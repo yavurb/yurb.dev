@@ -1,61 +1,67 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import formatDate from "@/utils/formatDate";
-
-import fetchApi from '@/lib/fetch-api';
+import LogEntryItem from "@/components/LogEntry.astro";
+import fetchApi from "@/lib/fetch-api";
+import { postToEntry } from "@/lib/log";
 import type Post from "@/interfaces/post";
 
-const posts = await fetchApi<Post[]>({
-  endpoint: 'posts',
-  wrappedByKey: 'data',
-  query: {
-    'sort': ['publishedAt:desc'],
-  }
+const posts: Post[] = await fetchApi<Post[]>({
+  endpoint: "posts",
+  wrappedByKey: "data",
+  query: { sort: ["publishedAt:desc"] },
+  defaultReturn: [],
 });
+
+const entries = posts.map(postToEntry);
 ---
 
-<Layout title="Template - All Posts">
-  <main class="flex flex-col gap-20">
-    <h1 class="text-2xl text-neutral-100">Posts</h1>
+<Layout
+  title="Writing — yurb.dev"
+  description="Backend notes — APIs, databases, infrastructure — written down so they stick."
+>
+  <section
+    aria-labelledby="posts-title"
+    class="flex flex-wrap items-end justify-between gap-6 border-b-2 border-fg pb-10 pt-[clamp(40px,7vw,80px)]"
+  >
+    <h1
+      id="posts-title"
+      class="display text-[clamp(64px,13vw,168px)] leading-[0.86] tracking-[-0.04em]"
+    >
+      <span class="label mb-4 block text-sm font-medium normal-case text-accent"
+        >02 — $ git log -- posts/</span
+      >
+      Writing
+    </h1>
+    <p class="max-w-[36ch] text-muted">
+      Backend notes — APIs, databases, infrastructure — written down so they stick. Newest first.
+    </p>
+  </section>
 
-    <article class="flex flex-col gap-4">
-      {
-        posts.map((post) => (
+  {
+    entries.length > 0 ? (
+      <ol role="list" class="mb-24 mt-10 border-l-2 border-fg">
+        {entries.map((entry, i) => (
+          <LogEntryItem entry={entry} head={i === 0} />
+        ))}
+        <li class="label pl-8 text-muted">(root commit)</li>
+      </ol>
+    ) : (
+      <div class="paper my-12 border-2 border-fg p-8">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-2 border-fg bg-surface p-7">
+          <p class="font-mono text-sm">
+            <span class="text-accent">$</span> ls posts/{" "}
+            <span class="text-muted">→ 0 files · the first one is drafting</span>
+          </p>
           <a
-            class="group flex flex-col gap-2 border-t border-neutral-700 py-4 transition-all hover:text-neutral-100"
-            href={`/posts/${post.id}`}
+            href="https://github.com/yavurb"
+            target="_blank"
+            rel="noreferrer"
+            class="label border-b-2 border-accent py-3 text-[13px] hover:text-accent"
           >
-            <div class="flex w-full items-center justify-between">
-              <h2 class="text-lg">{post.title}</h2>
-
-              <div class="flex flex-row items-center gap-4">
-                <p>{formatDate(new Date(post.published_at))}</p>
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 18 18"
-                  fill="none"
-                  class="transition-all duration-300 group-hover:translate-x-1"
-                >
-                  <path
-                    d="M5.25 12.75L12.75 5.25"
-                    stroke="#999999"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                  <path
-                    d="M5.25 5.25H12.75V12.75"
-                    stroke="#999999"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              </div>
-            </div>
-            <p>{post.description}</p>
+            Watch on GitHub ↗
           </a>
-        ))
-      }
-    </article>
-  </main>
+        </div>
+      </div>
+    )
+  }
 </Layout>

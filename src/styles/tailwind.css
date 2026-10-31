@@ -2,3 +2,119 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Theme tokens — "Index log" (B × C), Cobalt palette.
+ * Values are RGB channels so Tailwind can apply opacity: rgb(var(--x) / <alpha>).
+ * Light is the default; dark applies when the visitor's OS prefers it
+ * (unless they picked light with the toggle) or when they pick dark.
+ */
+@layer base {
+  :root {
+    color-scheme: light;
+    --bg: 245 245 243; /* #F5F5F3 page */
+    --fg: 17 17 17; /* #111111 text + heavy rules */
+    --muted: 74 77 82; /* #4A4D52 secondary text (7.9:1) */
+    --rule: 201 201 196; /* #C9C9C4 hairlines */
+    --surface: 255 255 255; /* cards, notes */
+    --inline-code: 230 230 225; /* #E6E6E1 */
+    --code-bg: 17 17 17; /* code blocks */
+    --code-fg: 236 236 236;
+    --code-muted: 185 188 194;
+    --code-border: 42 44 48;
+    --grid: 232 232 227; /* grid-paper lines */
+    --accent: 31 59 255; /* #1F3BFF cobalt (6.3:1 on bg) */
+    --on-accent: 255 255 255; /* text on accent blocks */
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: 15 16 18; /* #0F1012 */
+    --fg: 237 237 234; /* #EDEDEA */
+    --muted: 163 166 172; /* #A3A6AC (7.9:1) */
+    --rule: 44 46 51; /* #2C2E33 */
+    --surface: 23 24 27; /* #17181B */
+    --inline-code: 31 33 37; /* #1F2125 */
+    --code-bg: 23 24 27;
+    --code-fg: 236 236 236;
+    --code-muted: 163 166 172;
+    --code-border: 44 46 51;
+    --grid: 28 29 33; /* #1C1D21 */
+    --accent: 123 140 255; /* #7B8CFF periwinkle (6.4:1 on bg) */
+    --on-accent: 15 16 18; /* dark text on the lighter accent */
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: 15 16 18;
+      --fg: 237 237 234;
+      --muted: 163 166 172;
+      --rule: 44 46 51;
+      --surface: 23 24 27;
+      --inline-code: 31 33 37;
+      --code-bg: 23 24 27;
+      --code-fg: 236 236 236;
+      --code-muted: 163 166 172;
+      --code-border: 44 46 51;
+      --grid: 28 29 33;
+      --accent: 123 140 255;
+      --on-accent: 15 16 18;
+    }
+  }
+
+  html {
+    @apply bg-bg font-sans text-fg antialiased;
+  }
+
+  ::selection {
+    background: rgb(var(--accent));
+    color: rgb(var(--on-accent));
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--accent));
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /* Big condensed uppercase type — headlines, titles, section names. */
+  .display {
+    font-weight: 800;
+    font-stretch: 75%;
+    text-transform: uppercase;
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+  }
+
+  /* Small monospace uppercase labels — nav, metadata, section numbers. */
+  .label {
+    @apply font-mono text-xs uppercase tracking-[0.06em];
+  }
+
+  .paper {
+    background-image: linear-gradient(rgb(var(--grid)) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--grid)) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  /* Theme toggle icon: moon in light, sun in dark. */
+  .theme-sun {
+    display: none;
+  }
+  :root[data-theme="dark"] .theme-sun {
+    display: block;
+  }
+  :root[data-theme="dark"] .theme-moon {
+    display: none;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme-sun {
+      display: block;
+    }
+    :root:not([data-theme="light"]) .theme-moon {
+      display: none;
+    }
+  }
+}
