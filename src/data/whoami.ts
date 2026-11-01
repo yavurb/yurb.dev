@@ -46,7 +46,7 @@ const whoami: Whoami = {
   now: [
     {
       label: "Working on",
-      value: "Leading a team of five at Zumma — and the AI agents behind our financial workflows.",
+      value: "Leading engineering at Zumma — and the AI agents behind our financial workflows.",
     },
     { label: "Building", value: "Rill, Yurback, and this site — [anything else on the bench]." },
     { label: "Studying", value: "Wrapping up a BSc in Computer Science at University of the People." },
@@ -55,10 +55,10 @@ const whoami: Whoami = {
     {
       period: "Nov 2025 — now · Promoted · Mexico City",
       title: "Head of Engineering @ Zumma",
-      summary: "Lead a team of five — and still build critical components and new features myself.",
+      summary: "Lead Zumma’s engineering team — and still build critical components and new features myself.",
       highlights: [
         "Guide the planning and development of Zumma’s AI processes and AI agents",
-        "Lead every technical meeting with clients",
+        "Act as the face of Zumma’s engineering with clients and partners",
         "Define our engineering processes, the scope of new work and its priorities",
         "Shape where Zumma’s engineering goes next — and build it",
       ],
