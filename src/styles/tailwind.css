@@ -65,6 +65,18 @@
 
   html {
     @apply bg-bg font-sans text-fg antialiased;
+    scroll-behavior: smooth;
+  }
+
+  /* Leave a little air above a section when jumping to it from the nav. */
+  [id] {
+    scroll-margin-top: 24px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 
   ::selection {
@@ -91,6 +103,34 @@
   /* Small monospace uppercase labels — nav, metadata, section numbers. */
   .label {
     @apply font-mono text-xs uppercase tracking-[0.06em];
+  }
+
+  /*
+   * On arrival at a section from the nav, its number flashes as an accent block.
+   * Same-page clicks add .is-arriving (Header.astro); :target covers arriving
+   * from another page, e.g. /posts → /#contact.
+   */
+  :target .section-index,
+  .section-index.is-arriving {
+    animation: section-arrive 1.4s ease-out;
+  }
+  @keyframes section-arrive {
+    0%,
+    35% {
+      background: rgb(var(--accent));
+      color: rgb(var(--on-accent));
+      box-shadow: 0 0 0 6px rgb(var(--accent));
+    }
+    100% {
+      background: transparent;
+      box-shadow: 0 0 0 6px transparent;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :target .section-index,
+    .section-index.is-arriving {
+      animation: none;
+    }
   }
 
   .paper {

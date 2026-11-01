@@ -1,18 +1,10 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import LogEntryItem from "@/components/LogEntry.astro";
-import fetchApi from "@/lib/fetch-api";
+import { getPosts } from "@/lib/posts";
 import { postToEntry } from "@/lib/log";
-import type Post from "@/interfaces/post";
 
-const posts: Post[] = await fetchApi<Post[]>({
-  endpoint: "posts",
-  wrappedByKey: "data",
-  query: { sort: ["publishedAt:desc"] },
-  defaultReturn: [],
-});
-
-const entries = posts.map(postToEntry);
+const entries = (await getPosts()).map(postToEntry);
 ---
 
 <Layout
@@ -37,16 +29,17 @@ const entries = posts.map(postToEntry);
     </p>
   </section>
 
-  {
-    entries.length > 0 ? (
-      <ol role="list" class="mb-24 mt-10 border-l-2 border-fg">
-        {entries.map((entry, i) => (
-          <LogEntryItem entry={entry} head={i === 0} />
-        ))}
-        <li class="label pl-8 text-muted">(root commit)</li>
-      </ol>
-    ) : (
-      <div class="paper my-12 border-2 border-fg p-8">
+  <!-- The log sits on grid paper, like the Writing section on the home page. -->
+  <section aria-label="All posts" class="paper mb-24 border-b-2 border-fg py-12">
+    {
+      entries.length > 0 ? (
+        <ol role="list" class="border-l-2 border-fg">
+          {entries.map((entry, i) => (
+            <LogEntryItem entry={entry} head={i === 0} />
+          ))}
+          <li class="label pl-8 text-muted">(root commit)</li>
+        </ol>
+      ) : (
         <div class="flex flex-wrap items-center justify-between gap-4 border-2 border-fg bg-surface p-7">
           <p class="font-mono text-sm">
             <span class="text-accent">$</span> ls posts/{" "}
@@ -61,7 +54,7 @@ const entries = posts.map(postToEntry);
             Watch on GitHub ↗
           </a>
         </div>
-      </div>
-    )
-  }
+      )
+    }
+  </section>
 </Layout>

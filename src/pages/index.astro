@@ -5,20 +5,13 @@ import LogEntryItem from "@/components/LogEntry.astro";
 import presentation from "@/data/presentation";
 import whoami from "@/data/whoami";
 import fetchApi from "@/lib/fetch-api";
+import { getPosts } from "@/lib/posts";
 import { buildLog, postToEntry } from "@/lib/log";
 import formatDate from "@/utils/formatDate";
 import type Post from "@/interfaces/post";
 import type Projects from "@/interfaces/projects";
 
-const posts: Post[] = await fetchApi<Post[]>({
-  endpoint: "posts",
-  wrappedByKey: "data",
-  query: {
-    sort: ["publishedAt:desc"],
-    pagination: { page: 1, pageSize: 5 },
-  },
-  defaultReturn: [],
-});
+const posts: Post[] = await getPosts({ limit: 5 });
 
 const projects: Projects[] = await fetchApi<Projects[]>({
   endpoint: "projects",
@@ -151,23 +144,40 @@ const log = buildLog(olderPosts, projects);
     class="paper flex flex-wrap gap-6 border-b-2 border-fg py-12"
   >
     <SectionHeading id="writing-title" index={2} title="Writing" />
-    <div
-      class="flex min-w-0 flex-[999_1_640px] flex-wrap items-center justify-between gap-4 border-2 border-fg bg-surface p-7"
-    >
-      <p class="font-mono text-sm">
-        <span class="text-accent">$</span> ls posts/
-        <span class="text-muted">
-          → {posts.length === 0 ? "0 files · first one drafting" : `${posts.length}${posts.length === 5 ? "+" : ""} files · latest: ${latestPost?.title}`}
-        </span>
-      </p>
-      <a href="/posts" class="label border-b-2 border-accent py-3 text-[13px] hover:text-accent">All posts →</a>
+    <div class="min-w-0 flex-[999_1_640px] border-2 border-fg bg-surface">
+      <div class="flex flex-wrap items-center justify-between gap-4 px-7 py-5">
+        <p class="font-mono text-sm">
+          <span class="text-accent">$</span> ls posts/
+          <span class="text-muted">
+            → {posts.length === 0 ? "0 files · first one drafting" : `${posts.length}${posts.length === 5 ? "+" : ""} files`}
+          </span>
+        </p>
+        <a href="/posts" class="label border-b-2 border-accent py-3 text-[13px] hover:text-accent">All posts →</a>
+      </div>
+      {
+        posts.length > 0 && (
+          <ol role="list" class="border-t-2 border-fg">
+            {posts.slice(0, 3).map((post) => (
+              <li class="border-b border-rule last:border-b-0">
+                <a
+                  href={`/posts/${post.id}`}
+                  class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] items-baseline gap-x-6 gap-y-1 px-7 py-4 hover:text-accent"
+                >
+                  <span class="display text-[26px] leading-none">{post.title}</span>
+                  <span class="label text-muted sm:text-right">{formatDate(new Date(post.published_at))}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        )
+      }
     </div>
   </section>
 
   <!-- Contact -->
   <section id="contact" aria-labelledby="contact-title" class="pb-12 pt-16">
     <h2 id="contact-title" class="mb-6 font-mono text-sm font-medium text-accent">
-      03 — Contact · git push origin hello
+      <span class="section-index">03</span> — Contact · git push origin hello
     </h2>
     <a
       href={`mailto:${presentation.mail}`}

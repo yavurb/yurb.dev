@@ -6,7 +6,7 @@ import loadLanguages from "prismjs/components/";
 loadLanguages(["py", "ts", "go", "bash", "sql", "yaml", "json", "hcl"]); // TODO: get these values from a remote config
 
 import Layout from "@/layouts/Layout.astro";
-import fetchApi from "@/lib/fetch-api";
+import { getPost, getPosts } from "@/lib/posts";
 import { readingTime } from "@/lib/log";
 import formatDate from "@/utils/formatDate";
 import presentation from "@/data/presentation";
@@ -14,18 +14,13 @@ import type Post from "@/interfaces/post";
 
 const { id } = Astro.params;
 
-const post: Post | undefined = await fetchApi<Post>({ endpoint: `posts/${id}` });
+const post = id ? await getPost(id) : undefined;
 if (!post || !post.content) {
   return new Response("Post not found", { status: 404 });
 }
 
 // Neighbours for the older/newer links (same list the Posts page shows).
-const allPosts: Post[] = await fetchApi<Post[]>({
-  endpoint: "posts",
-  wrappedByKey: "data",
-  query: { sort: ["publishedAt:desc"] },
-  defaultReturn: [],
-});
+const allPosts: Post[] = await getPosts();
 const position = allPosts.findIndex((p) => String(p.id) === String(post.id));
 const newer = position > 0 ? allPosts[position - 1] : undefined;
 const older = position >= 0 ? allPosts[position + 1] : undefined;
@@ -75,7 +70,7 @@ const published = formatDate(new Date(post.published_at));
     ← All writing
   </a>
 
-  <header class="border-b-2 border-fg pb-10 pt-6">
+  <header class="paper border-b-2 border-t-2 border-fg pb-12 pt-10">
     <p class="label mb-4 text-accent">
       commit · {published}{minutes ? ` · ${minutes} min read` : ""}
     </p>

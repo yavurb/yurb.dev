@@ -5,11 +5,12 @@ import presentation from "@/data/presentation";
 
 const pathname = removeTrailingSlash(Astro.url.pathname) || "/";
 
+// `spy` = the id of the home-page section this link lights up for while scrolling.
 const links = [
-  { href: "/whoami", label: "Whoami", match: (p: string) => p === "/whoami" },
-  { href: "/#log", label: "Log", match: (p: string) => p === "/" },
-  { href: "/posts", label: "Writing", match: (p: string) => p.startsWith("/posts") },
-  { href: "/#contact", label: "Contact", match: () => false },
+  { href: "/whoami", label: "Whoami", spy: "whoami", match: (p: string) => p === "/whoami" },
+  { href: "/#log", label: "Log", spy: "log", match: (p: string) => p === "/" },
+  { href: "/posts", label: "Writing", spy: "writing", match: (p: string) => p.startsWith("/posts") },
+  { href: "/#contact", label: "Contact", spy: "contact", match: () => false },
 ];
 ---
 
@@ -28,11 +29,10 @@ const links = [
         return (
           <a
             href={link.href}
+            data-spy={link.spy}
+            data-active={active ? "true" : "false"}
             aria-current={active ? "page" : undefined}
-            class:list={[
-              "border-b-2 px-2.5 py-3 hover:text-accent",
-              active ? "border-accent text-accent" : "border-transparent",
-            ]}
+            class="border-b-2 border-transparent px-2.5 py-3 transition-colors duration-300 hover:text-accent data-[active=true]:border-accent data-[active=true]:text-accent"
           >
             {`${String(index).padStart(2, "0")} ${link.label}`}
           </a>
@@ -42,3 +42,81 @@ const links = [
     <span class="ml-2"><ThemeToggle /></span>
   </nav>
 </header>
+
+<script>
+  const onHome = location.pathname === "/" || location.pathname === "";
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const navLinks = [...document.querySelectorAll<HTMLAnchorElement>("nav[aria-label='Main'] a[data-spy]")];
+
+  const flash = (section: Element) => {
+    const index = section.querySelector(".section-index");
+    if (!index) return;
+    index.classList.remove("is-arriving");
+    void (index as HTMLElement).offsetWidth; // restart the animation
+    index.classList.add("is-arriving");
+    index.addEventListener("animationend", () => index.classList.remove("is-arriving"), { once: true });
+  };
+
+  if (onHome) {
+    // 1. Same-page links (Log, Contact): smooth scroll, then flash the section number on arrival.
+    let arriving: Element | null = null;
+
+    navLinks.forEach((link) => {
+      const url = new URL(link.href);
+      if (url.pathname !== "/" || !url.hash) return;
+      link.addEventListener("click", (event) => {
+        const target = document.querySelector(url.hash);
+        if (!target) return;
+        event.preventDefault();
+        history.pushState(null, "", url.hash);
+        arriving = target;
+        target.scrollIntoView({ behavior: reduceMotion.matches ? "auto" : "smooth", block: "start" });
+        // Fallback in case the section is already in view (no intersection change).
+        window.setTimeout(() => {
+          if (arriving === target) {
+            flash(target);
+            arriving = null;
+          }
+        }, reduceMotion.matches ? 0 : 900);
+      });
+    });
+
+    // 2. Scroll-spy: light up the nav item for the section in the middle of the screen.
+    const setActive = (id: string) =>
+      navLinks.forEach((link) => (link.dataset.active = link.dataset.spy === id ? "true" : "false"));
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          setActive(entry.target.id);
+          if (entry.target === arriving) {
+            flash(entry.target);
+            arriving = null;
+          }
+        });
+      },
+      { rootMargin: "-45% 0px -45% 0px" },
+    );
+
+    const sections = navLinks
+      .map((link) => document.getElementById(link.dataset.spy ?? ""))
+      .filter((s): s is HTMLElement => s !== null);
+    sections.forEach((section) => observer.observe(section));
+
+    // The last section (Contact) can't reach the middle of the screen,
+    // so at the bottom of the page it wins.
+    const lastSection = sections.reduce<HTMLElement | null>(
+      (last, s) => (!last || s.offsetTop > last.offsetTop ? s : last),
+      null,
+    );
+    window.addEventListener(
+      "scroll",
+      () => {
+        const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
+        if (atBottom && lastSection) setActive(lastSection.id);
+      },
+      { passive: true },
+    );
+  }
+</script>

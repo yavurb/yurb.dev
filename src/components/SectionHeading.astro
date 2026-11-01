@@ -12,7 +12,7 @@ const { id, index, title, command } = Astro.props;
 
 <div class="flex-[1_1_240px]">
   <h2 id={id} class="display text-[44px] leading-none">
-    <span class="label mb-2.5 block text-sm font-medium normal-case text-accent"
+    <span class="section-index label mb-2.5 block w-fit text-sm font-medium normal-case text-accent"
       >{String(index).padStart(2, "0")}</span
     >
     {title}
