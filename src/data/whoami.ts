@@ -89,9 +89,11 @@ const whoami: Whoami = {
   origin: "2018 — started studying software engineering",
   toolbox: [
     { label: "languages", value: "Python · Go · JavaScript" },
-    { label: "ai", value: "AI agents · WhatsApp API" },
-    { label: "data", value: "PostgreSQL" },
+    { label: "ai · models", value: "Gemini (Vertex AI) · OpenAI · Anthropic" },
+    { label: "ai · tooling", value: "Langfuse · LiteLLM · OpenRouter · Instructor" },
+    { label: "data", value: "PostgreSQL · Qdrant" },
     { label: "infra", value: "Terraform · AWS · GCP" },
+    { label: "integrations", value: "WhatsApp API" },
     { label: "realtime", value: "WebRTC" },
     { label: "certified", value: "AWS Cloud Quest: Cloud Practitioner" },
   ],
