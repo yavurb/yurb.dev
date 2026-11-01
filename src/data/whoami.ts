@@ -51,11 +51,19 @@ const whoami: Whoami = {
   ],
   roles: [
     {
-      period: "Mar 2023 — now · Mexico City",
+      // TODO(roy): the month you became Head of Engineering.
+      period: "[Month Year] — now · Promoted · Mexico City",
       title: "Head of Engineering @ Zumma",
       summary:
-        "Founding engineer. Built Mexico’s first automated invoicing AI agent, architected scalable AI expense management for 100,000+ customers, and designed an image-processing pipeline for critical data extraction.",
+        "Leading engineering. Led Mexico’s first automated invoicing AI agent, scalable AI expense management for 100,000+ customers, and an image-processing pipeline for critical data extraction.",
       tags: ["python", "go", "ai-agents", "whatsapp-api"],
+    },
+    {
+      period: "Mar 2023 — [Month Year] · Mexico City",
+      title: "Founding Engineer @ Zumma",
+      summary:
+        "Joined as the founding backend engineer. [What you built in this stage — e.g. the first version of the platform.]",
+      tags: ["backend", "python", "go"],
     },
     {
       period: "Mar 2021 — Mar 2023 · Caracas",
