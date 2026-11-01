@@ -1,6 +1,6 @@
 # yurb.dev
 
-Roy's personal site and blog — Astro 3 + Tailwind, server output on Vercel. Content comes from Roy's backend API (posts, projects) plus local data files.
+Roy's personal site and blog — Astro 7 + Tailwind 4, server output on Vercel. Node 26 locally and in CI (`.nvmrc`); Vercel functions run on Node 24 (it has no 26 runtime yet), hence `engines: ">=24"`. Content comes from Roy's backend API (posts, projects) plus local data files.
 
 Branch `redesign/index-log` holds the redesign described below. It is **not pushed yet**; don't push, force-push or open PRs unless Roy asks.
 
@@ -8,12 +8,12 @@ Branch `redesign/index-log` holds the redesign described below. It is **not push
 
 ```bash
 pnpm install
-pnpm dev        # Astro dev server (default port 4321; the README's 3000 is outdated)
-pnpm check      # astro check — CI runs this (via npm) on every push
+pnpm dev        # Astro dev server (port 4321)
+pnpm check      # astro check — CI runs this on every push
 pnpm build
 ```
 
-pnpm 10 blocks install scripts unless approved: `pnpm-workspace.yaml` approves `sharp` and `esbuild`. If images stop loading in dev, sharp lost its native binary — run `pnpm rebuild sharp`.
+pnpm is the only package manager (`packageManager` in `package.json`, `pnpm-lock.yaml`); don't add npm or yarn lockfiles. pnpm blocks install scripts unless approved: `pnpm-workspace.yaml` approves `sharp` and `esbuild`. If images stop loading in dev, sharp lost its native binary — run `pnpm rebuild sharp`.
 
 Env (`.env`): `BACKEND_URL`, `BACKEND_APIKEY` (backend API), `SITE_URL`. Optional `MOCK_POSTS` (dev only, see below).
 
@@ -22,7 +22,7 @@ Env (`.env`): `BACKEND_URL`, `BACKEND_APIKEY` (backend API), `SITE_URL`. Optiona
 Swiss/editorial typography merged with a git build-log metaphor.
 
 - **Type**: Archivo variable, condensed via `font-stretch: 75%`, weight 800, uppercase for display (`.display`); JetBrains Mono uppercase for labels/metadata (`.label`).
-- **Color (Cobalt palette)**: tokens are RGB channels in `src/styles/tailwind.css`, mapped to Tailwind colors in `tailwind.config.cjs` (`bg`, `fg`, `muted`, `rule`, `surface`, `accent`, `on-accent`, `code-*`). Light: accent `#1F3BFF` on `#F5F5F3`. Dark: accent `#7B8CFF` on `#0F1012`, dark text on accent blocks. Use tokens, never hard-coded hex in components.
+- **Color (Cobalt palette)**: tokens are RGB channels in `src/styles/tailwind.css`, mapped to Tailwind colors by the `@theme inline` block in the same file (`bg`, `fg`, `muted`, `rule`, `surface`, `accent`, `on-accent`, `code-*`). Light: accent `#1F3BFF` on `#F5F5F3`. Dark: accent `#7B8CFF` on `#0F1012`, dark text on accent blocks. Use tokens, never hard-coded hex in components.
 - **Theme**: light by default, dark from `prefers-color-scheme`, overridden by the toggle (`data-theme` on `<html>`, saved in `localStorage.theme`, applied before paint by the inline script in `Layout.astro`).
 - **Shapes**: 2px `fg` rules between sections, 1px `rule` hairlines, square timeline markers, no rounded corners, no shadows except the game overlay. `.paper` = grid-paper background.
 - **Voice**: first person ("I build what you don't see"). Git/terminal metaphors: `$ git log`, HEAD, `(root commit)`, `git push origin hello`.
@@ -60,7 +60,6 @@ Don't implement the game unless Roy asks; help him with it.
 - `presentation.ts`: the "yurb.dev v1" milestone date is a placeholder (`TODO(roy)`).
 - `src/assets/profile.png` (old circular avatar, 1.3 MB) is unused — delete only if Roy confirms.
 - `.github/workflows/deploy.yaml` is untracked on purpose: it deploys to Vercel production on push to `main` and writes certs from secrets. Roy decides whether to commit it.
-- Three lockfiles exist (`package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`) and CI uses npm. Settle on one with Roy before merging.
 - Local `origin` points at `git@github.com:yavurb/yurb.git`; the GitHub repo is `yavurb/yurb.dev` — check before pushing.
 - The branch has many small commits; Roy may want them squashed before the PR.
 

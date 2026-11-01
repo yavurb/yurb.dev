@@ -1,11 +1,37 @@
+@import "tailwindcss";
 @import "./prism.css";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
+/*
+ * Tailwind colors map to the RGB-channel tokens below. `inline` makes each
+ * utility read the token where it is used, so scoped overrides (the always-dark
+ * game dialog) still apply.
+ */
+@theme inline {
+  --color-bg: rgb(var(--bg));
+  --color-fg: rgb(var(--fg));
+  --color-muted: rgb(var(--muted));
+  --color-rule: rgb(var(--rule));
+  --color-surface: rgb(var(--surface));
+  --color-inline-code: rgb(var(--inline-code));
+  --color-code-bg: rgb(var(--code-bg));
+  --color-code-fg: rgb(var(--code-fg));
+  --color-code-muted: rgb(var(--code-muted));
+  --color-code-border: rgb(var(--code-border));
+  --color-accent: rgb(var(--accent));
+  --color-on-accent: rgb(var(--on-accent));
+}
+
+@theme {
+  --font-sans: "Archivo Variable", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  --container-site: 1200px;
+}
 
 /*
  * Theme tokens — "Index log" (B × C), Cobalt palette.
- * Values are RGB channels so Tailwind can apply opacity: rgb(var(--x) / <alpha>).
+ * Values are RGB channels, so plain CSS can still write rgb(var(--x) / <alpha>).
  * Light is the default; dark applies when the visitor's OS prefers it
  * (unless they picked light with the toggle) or when they pick dark.
  */
@@ -66,6 +92,12 @@
   html {
     @apply bg-bg font-sans text-fg antialiased;
     scroll-behavior: smooth;
+  }
+
+  /* Tailwind 4 dropped the pointer cursor on buttons; keep it. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
   }
 
   /* Leave a little air above a section when jumping to it from the nav. */

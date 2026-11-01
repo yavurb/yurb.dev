@@ -48,8 +48,9 @@ const marked = new Marked(
 
 marked.use({
   renderer: {
-    heading(text, level, raw) {
-      if (level !== 2) return false;
+    heading({ tokens, depth, text: raw }) {
+      if (depth !== 2) return false;
+      const text = this.parser.parseInline(tokens);
       let slug = slugify(raw) || `section-${toc.length + 1}`;
       while (usedIds.has(slug)) slug += "-x";
       usedIds.add(slug);

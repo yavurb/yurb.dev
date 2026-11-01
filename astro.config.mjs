@@ -1,13 +1,17 @@
 import { defineConfig } from "astro/config";
-import tailwind from "@astrojs/tailwind";
+import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
 import nodejs from "@astrojs/node";
-import vercel from "@astrojs/vercel/serverless";
+import vercel from "@astrojs/vercel";
+import { loadEnv } from "vite";
+
+const env = loadEnv(process.env.NODE_ENV ?? "", process.cwd(), "");
+const isBuild = process.argv.includes("build");
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [tailwind(), sitemap()],
-  site: import.meta.env.SITE_URL,
+  integrations: [sitemap()],
+  site: env.SITE_URL,
   markdown: {
     syntaxHighlight: "shiki",
     shikiConfig: {
@@ -16,5 +20,8 @@ export default defineConfig({
     },
   },
   output: "server",
-  adapter: import.meta.env.PROD ? vercel() : nodejs({ mode: "standalone" }),
+  adapter: isBuild ? vercel() : nodejs({ mode: "standalone" }),
+  vite: {
+    plugins: [tailwindcss()],
+  },
 });
