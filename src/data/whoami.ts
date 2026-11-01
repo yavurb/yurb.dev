@@ -90,7 +90,7 @@ const whoami: Whoami = {
   toolbox: [
     { label: "languages", value: "Python · Go · JavaScript" },
     { label: "ai · models", value: "Gemini (Vertex AI) · OpenAI · Anthropic" },
-    { label: "ai · tooling", value: "Langfuse · LiteLLM · OpenRouter · Instructor" },
+    { label: "ai · tooling", value: "Langfuse · LiteLLM · Instructor" },
     { label: "data", value: "PostgreSQL · Qdrant" },
     { label: "infra", value: "Terraform · AWS · GCP" },
     { label: "integrations", value: "WhatsApp API" },
