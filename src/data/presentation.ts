@@ -20,14 +20,14 @@ type Presentation = {
 const presentation: Presentation = {
   name: "Roy",
   mail: "yavurb@gmail.com",
-  role: "Backend developer",
+  role: "Head of Engineering · backend engineer",
   headline: [
-    { text: "Roy builds" },
-    { text: "backends", accent: true },
-    { text: "in public" },
+    { text: "I build" },
+    { text: "what you", accent: true },
+    { text: "don’t see" },
   ],
   intro:
-    "Backend developer. Everything I ship, break, and learn lands in the log below.",
+    "Head of Engineering at Zumma, building AI agents for finance. Everything I ship, break and learn lands in the log below.",
   sandbox:
     "This site is my sandbox — expect experiments and the odd bug, on purpose.",
   stack: [

@@ -68,8 +68,8 @@ const log = buildLog(olderPosts, projects);
       class="grid min-w-0 flex-[999_1_640px] grid-cols-[repeat(auto-fit,minmax(220px,1fr))] border-2 border-fg"
     >
       <div class="border-b border-r border-rule p-6">
-        <p class="label mb-1.5 text-muted">Writing code since</p>
-        <p class="display text-5xl leading-none">{whoami.codingSince}</p>
+        <p class="label mb-1.5 text-muted">{whoami.since.label}</p>
+        <p class="display text-5xl leading-none">{whoami.since.value}</p>
       </div>
       <div class="border-b border-r border-rule p-6">
         <p class="label mb-1.5 text-muted">Currently</p>

@@ -109,18 +109,18 @@ import whoami from "@/data/whoami";
         ))
       }
       {
-        whoami.education && (
+        whoami.education.map((edu) => (
           <li class="relative pb-2 pl-8">
             <span
               aria-hidden="true"
               class="absolute -left-[7px] top-1 h-3 w-3 border-2 border-fg bg-bg"
             />
-            <p class="label text-muted">{whoami.education.period} · Education</p>
+            <p class="label text-muted">{edu.period} · Education</p>
             <div class="mb-5 border-b border-rule pb-7 pt-2.5">
-              <h3 class="display text-[28px] leading-none">{whoami.education.title}</h3>
+              <h3 class="display text-[28px] leading-none">{edu.title}</h3>
             </div>
           </li>
-        )
+        ))
       }
       <li class="label pl-8 text-muted">(root commit) · {whoami.origin}</li>
     </ol>
