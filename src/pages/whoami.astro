@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import Layout from "@/layouts/Layout.astro";
 import SectionHeading from "@/components/SectionHeading.astro";
 import presentation from "@/data/presentation";
@@ -25,9 +26,12 @@ import whoami from "@/data/whoami";
     <div class="min-w-0 max-w-[340px] flex-[1_1_260px]">
       {
         whoami.photo ? (
-          <img
+          <Image
             src={whoami.photo}
             alt={`Photo of ${presentation.name}`}
+            widths={[340, 680]}
+            sizes="(max-width: 640px) 100vw, 340px"
+            loading="eager"
             class="aspect-[4/5] w-full border-2 border-fg object-cover"
           />
         ) : (

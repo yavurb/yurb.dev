@@ -28,8 +28,12 @@ type Whoami = {
   offTheClock: string;
   /** Path or URL to a CV PDF (e.g. "/cv.pdf" in /public). Empty hides the button. */
   cvUrl: string;
-  /** Image in /public (e.g. "/roy.webp"). Empty shows a placeholder frame. */
-  photo: string;
+  /**
+   * Photo imported from src/assets (optimized by astro:assets), e.g.
+   *   import roy from "@/assets/roy.jpg";  …  photo: roy,
+   * null shows a placeholder frame.
+   */
+  photo: ImageMetadata | null;
 };
 
 const whoami: Whoami = {
@@ -40,8 +44,8 @@ const whoami: Whoami = {
   facts: [
     { label: "Name", value: "Royner Perez" },
     { label: "Based in", value: "Mexico City" },
-    { label: "Speaks", value: "[Languages]" },
-    { label: "Status", value: "[Open to / Not looking]" },
+    { label: "Speaks", value: "Spanish (native) · English" },
+    { label: "Status", value: "Always open to great opportunities" },
   ],
   now: [
     {
@@ -114,7 +118,7 @@ const whoami: Whoami = {
   offTheClock:
     "[A few lines that aren’t about code — hobbies, places, what you’re reading.]",
   cvUrl: "",
-  photo: "",
+  photo: null,
 };
 
 export default whoami;
