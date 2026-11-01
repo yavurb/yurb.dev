@@ -46,7 +46,7 @@ const whoami: Whoami = {
   facts: [
     { label: "Name", value: "Royner Perez" },
     { label: "Based in", value: "Mexico City" },
-    { label: "Speaks", value: "Spanish (native) · English" },
+    { label: "Speaks", value: "Spanish · English" },
     { label: "Status", value: "Always open to great opportunities" },
   ],
   now: [
