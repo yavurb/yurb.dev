@@ -53,7 +53,7 @@ const whoami: Whoami = {
   ],
   roles: [
     {
-      period: "Nov 2025 — now · Promoted · Mexico City",
+      period: "Nov 2024 — now · Promoted · Mexico City",
       title: "Head of Engineering @ Zumma",
       summary: "Lead Zumma’s engineering team — and still build critical components and new features myself.",
       highlights: [
@@ -65,7 +65,7 @@ const whoami: Whoami = {
       tags: ["ai-agents", "leadership", "python", "go"],
     },
     {
-      period: "Mar 2023 — Nov 2025 · Mexico City",
+      period: "Mar 2023 — Nov 2024 · Mexico City",
       title: "Founding Engineer @ Zumma",
       summary:
         "Joined as the founding backend engineer. Architected and built Zumma’s main product, Facturación de Gastos en Automático (automatic expense invoicing), now serving 100,000+ customers — including the extraction pipeline that pulls the data needed to request and issue each invoice on the merchant’s portal.",
