@@ -6,6 +6,7 @@ import presentation from "@/data/presentation";
 const pathname = removeTrailingSlash(Astro.url.pathname) || "/";
 
 const links = [
+  { href: "/whoami", label: "Whoami", match: (p: string) => p === "/whoami" },
   { href: "/#log", label: "Log", match: (p: string) => p === "/" },
   { href: "/posts", label: "Writing", match: (p: string) => p.startsWith("/posts") },
   { href: "/#contact", label: "Contact", match: () => false },
@@ -33,7 +34,7 @@ const links = [
               active ? "border-accent text-accent" : "border-transparent",
             ]}
           >
-            {`${String(index + 1).padStart(2, "0")} ${link.label}`}
+            {`${String(index).padStart(2, "0")} ${link.label}`}
           </a>
         );
       })

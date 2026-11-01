@@ -3,6 +3,7 @@ import Layout from "@/layouts/Layout.astro";
 import SectionHeading from "@/components/SectionHeading.astro";
 import LogEntryItem from "@/components/LogEntry.astro";
 import presentation from "@/data/presentation";
+import whoami from "@/data/whoami";
 import fetchApi from "@/lib/fetch-api";
 import { buildLog, postToEntry } from "@/lib/log";
 import formatDate from "@/utils/formatDate";
@@ -67,6 +68,30 @@ const log = buildLog(olderPosts, projects);
     </div>
   </section>
 
+  <!-- Whoami teaser -->
+  <section id="whoami" aria-labelledby="whoami-title" class="flex flex-wrap gap-6 border-b-2 border-fg py-12">
+    <SectionHeading id="whoami-title" index={0} title="Whoami" command="$ whoami" />
+    <div
+      class="grid min-w-0 flex-[999_1_640px] grid-cols-[repeat(auto-fit,minmax(220px,1fr))] border-2 border-fg"
+    >
+      <div class="border-b border-r border-rule p-6">
+        <p class="label mb-1.5 text-muted">Writing code since</p>
+        <p class="display text-5xl leading-none">{whoami.codingSince}</p>
+      </div>
+      <div class="border-b border-r border-rule p-6">
+        <p class="label mb-1.5 text-muted">Currently</p>
+        <p class="display text-[28px] leading-[1.05]">{whoami.current}</p>
+      </div>
+      <a
+        href="/whoami"
+        class="flex flex-col justify-between gap-4 bg-accent p-6 text-on-accent hover:opacity-90"
+      >
+        <span class="label">Trajectory, stack, how I work</span>
+        <span class="display text-[32px] leading-none">More about me →</span>
+      </a>
+    </div>
+  </section>
+
   <!-- Log -->
   <section id="log" aria-labelledby="log-title" class="flex flex-wrap gap-6 border-b-2 border-fg py-12">
     <SectionHeading id="log-title" index={1} title="Log" command="$ git log --oneline" />
@@ -105,7 +130,17 @@ const log = buildLog(olderPosts, projects);
 
       {log.map((entry) => <LogEntryItem entry={entry} />)}
 
-      <li class="label pl-8 pt-2 text-muted">(root commit)</li>
+      <li class="label pl-8 pt-2 text-muted">
+        <!-- Easter egg trigger: looks like plain text on purpose. -->
+        <button
+          type="button"
+          data-egg-open
+          title="git checkout root"
+          class="label cursor-text bg-transparent p-0 text-muted hover:text-accent"
+        >
+          (root commit)
+        </button>
+      </li>
     </ol>
   </section>
 

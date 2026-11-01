@@ -1,0 +1,186 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SectionHeading from "@/components/SectionHeading.astro";
+import presentation from "@/data/presentation";
+import whoami from "@/data/whoami";
+---
+
+<Layout title="Whoami — yurb.dev" description={whoami.intro}>
+  <!-- Hero -->
+  <section
+    aria-labelledby="whoami-title"
+    class="flex flex-wrap items-end gap-10 border-b-2 border-fg pb-12 pt-[clamp(40px,7vw,80px)]"
+  >
+    <div class="min-w-0 flex-[999_1_560px]">
+      <p class="mb-4 font-mono text-sm text-accent">00 — $ whoami</p>
+      <h1
+        id="whoami-title"
+        class="display text-[clamp(72px,15vw,200px)] leading-[0.84] tracking-[-0.045em]"
+      >
+        {presentation.name}<span class="text-accent">.</span>
+      </h1>
+      <p class="mt-7 max-w-[34ch] text-2xl font-semibold leading-snug">{whoami.intro}</p>
+    </div>
+
+    <div class="min-w-0 max-w-[340px] flex-[1_1_260px]">
+      {
+        whoami.photo ? (
+          <img
+            src={whoami.photo}
+            alt={`Photo of ${presentation.name}`}
+            class="aspect-[4/5] w-full border-2 border-fg object-cover"
+          />
+        ) : (
+          <div
+            role="img"
+            aria-label="Photo placeholder"
+            class="label flex aspect-[4/5] items-center justify-center border-2 border-fg bg-inline-code text-[13px] text-muted"
+          >
+            [Your photo]
+          </div>
+        )
+      }
+      <dl class="label mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 tracking-[0.04em]">
+        {
+          whoami.facts.map((fact) => (
+            <>
+              <dt class="text-muted">{fact.label}</dt>
+              <dd>{fact.value}</dd>
+            </>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <!-- 01 Now -->
+  <section aria-labelledby="now-title" class="flex flex-wrap gap-6 border-b-2 border-fg py-12">
+    <SectionHeading id="now-title" index={1} title="Now" command="$ git status" />
+    <div
+      class="grid min-w-0 flex-[999_1_640px] grid-cols-[repeat(auto-fit,minmax(200px,1fr))] border-2 border-fg"
+    >
+      {
+        whoami.now.map((item) => (
+          <div class="border-b border-r border-rule p-6">
+            <p class="label mb-2 text-accent">{item.label}</p>
+            <p>{item.value}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- 02 Trajectory -->
+  <section aria-labelledby="trajectory-title" class="flex flex-wrap gap-6 border-b-2 border-fg py-12">
+    <div class="flex-[1_1_240px]">
+      <SectionHeading id="trajectory-title" index={2} title="Trajectory" command="$ git log --career" />
+      {
+        whoami.cvUrl && (
+          <a
+            href={whoami.cvUrl}
+            class="label mt-4 inline-flex min-h-[44px] items-center border-2 border-fg px-4 hover:bg-fg hover:text-bg"
+          >
+            Download CV ↓
+          </a>
+        )
+      }
+    </div>
+
+    <ol role="list" class="min-w-0 flex-[999_1_640px] border-l-2 border-fg">
+      {
+        whoami.roles.map((role, i) => (
+          <li class="relative pb-2 pl-8">
+            <span
+              aria-hidden="true"
+              class:list={[
+                "absolute",
+                i === 0 ? "-left-[9px] top-0.5 h-4 w-4 bg-accent" : "-left-[7px] top-1 h-3 w-3 bg-fg",
+              ]}
+            />
+            <p class:list={["label", i === 0 ? "text-accent" : "text-muted"]}>
+              {i === 0 ? `HEAD · ${role.period}` : role.period}
+            </p>
+            <div class="mb-5 border-b border-rule pb-7 pt-2.5">
+              <h3 class="display text-[clamp(28px,4vw,36px)] leading-none">{role.title}</h3>
+              <p class="mb-2.5 mt-2 max-w-[60ch] text-muted">{role.summary}</p>
+              <p class="label text-muted">{role.tags.map((t) => `+${t}`).join(" ")}</p>
+            </div>
+          </li>
+        ))
+      }
+      {
+        whoami.education && (
+          <li class="relative pb-2 pl-8">
+            <span
+              aria-hidden="true"
+              class="absolute -left-[7px] top-1 h-3 w-3 border-2 border-fg bg-bg"
+            />
+            <p class="label text-muted">{whoami.education.period} · Education</p>
+            <div class="mb-5 border-b border-rule pb-7 pt-2.5">
+              <h3 class="display text-[28px] leading-none">{whoami.education.title}</h3>
+            </div>
+          </li>
+        )
+      }
+      <li class="label pl-8 text-muted">(root commit) · {whoami.origin}</li>
+    </ol>
+  </section>
+
+  <!-- 03 Toolbox -->
+  <section aria-labelledby="toolbox-title" class="paper flex flex-wrap gap-6 border-b-2 border-fg py-12">
+    <SectionHeading id="toolbox-title" index={3} title="Toolbox" command="$ cat stack.toml" />
+    <dl
+      class="grid min-w-0 flex-[999_1_640px] grid-cols-1 border-2 border-fg bg-surface sm:grid-cols-2"
+    >
+      {
+        whoami.toolbox.map((row) => (
+          <div class="border-b border-r border-rule px-6 py-5">
+            <dt class="label text-accent">[{row.label}]</dt>
+            <dd class="display mt-2 text-[26px] leading-tight">{row.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
+  <!-- 04 How I work -->
+  <section aria-labelledby="how-title" class="flex flex-wrap gap-6 border-b-2 border-fg py-12">
+    <SectionHeading id="how-title" index={4} title="How I work" />
+    <ol role="list" class="min-w-0 flex-[999_1_640px] border-b border-rule">
+      {
+        whoami.principles.map((principle, i) => (
+          <li class="flex flex-wrap gap-x-6 gap-y-2 border-t border-rule py-5">
+            <span class="display w-16 text-5xl leading-[0.9] text-accent" aria-hidden="true">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <div class="min-w-0 flex-[1_1_360px]">
+              <h3 class="display mb-1.5 text-[28px] leading-none">{principle.title}</h3>
+              <p class="text-muted">{principle.body}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <!-- 05 Off the clock -->
+  <section aria-labelledby="off-title" class="flex flex-wrap gap-6 border-b-2 border-fg py-12">
+    <SectionHeading id="off-title" index={5} title="Off the clock" command="$ ps aux | grep life" />
+    <p class="min-w-0 max-w-[40ch] flex-[999_1_640px] text-[22px] font-semibold leading-snug">
+      {whoami.offTheClock}
+    </p>
+  </section>
+
+  <!-- Contact -->
+  <section aria-labelledby="whoami-contact" class="pb-12 pt-16">
+    <h2 id="whoami-contact" class="mb-6 font-mono text-sm font-medium text-accent">
+      Contact · git push origin hello
+    </h2>
+    <a
+      href={`mailto:${presentation.mail}`}
+      class="display inline-block break-all border-b-[6px] border-accent text-[clamp(36px,8vw,104px)] leading-[0.95] hover:text-accent"
+    >
+      {presentation.mail}
+    </a>
+  </section>
+</Layout>

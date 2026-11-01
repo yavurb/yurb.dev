@@ -1,0 +1,435 @@
+---
+/**
+ * Packet Pong — the site's Easter egg.
+ *
+ * Ways in: type "play" anywhere, the Konami code (↑↑↓↓←→←→BA), clicking
+ * "(root commit)" in the home log (any [data-egg-open] element), or a
+ * link to /#play (/#play=OCTO-4F2A opens Join with the code filled in).
+ *
+ * This file is only the UI. The game plugs in through src/game/packet-pong;
+ * until it does, a mock drives every screen.
+ */
+const cmd = "text-fg";
+const btnPrimary =
+  "min-h-[52px] bg-accent px-6 font-mono font-medium uppercase tracking-[0.06em] text-on-accent hover:opacity-90";
+const btnGhost =
+  "min-h-[52px] border-2 border-fg bg-transparent px-6 font-mono font-medium uppercase tracking-[0.06em] text-fg hover:bg-fg hover:text-bg";
+---
+
+<dialog
+  data-egg
+  aria-labelledby="egg-title"
+  class="egg-dark m-auto max-h-[calc(100dvh-32px)] w-[calc(100%-32px)] max-w-[960px] overflow-auto border-2 border-fg bg-bg p-0 font-mono text-[15px] leading-relaxed text-fg"
+>
+  <header
+    class="label sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 border-b-2 border-fg bg-bg px-4 py-2.5"
+  >
+    <span id="egg-title"><span class="text-accent" aria-hidden="true">■</span> packet-pong — peer@yurb.dev</span>
+    <button
+      type="button"
+      data-egg-close
+      aria-label="Close game"
+      class="min-h-[44px] min-w-[44px] border-2 border-rule px-3 hover:border-fg">esc ✕</button
+    >
+  </header>
+
+  <div class="p-[clamp(20px,4vw,40px)]">
+    <!-- 1 · Unlocked -->
+    <section data-screen="boot" aria-label="Easter egg unlocked">
+      <div class="flex flex-col gap-1.5 text-muted">
+        <p><span class="text-accent">$</span> <span class={cmd}>git checkout root</span></p>
+        <p>Switched to a secret branch 'root'.</p>
+        <p>Easter egg found — nice digging.</p>
+      </div>
+      <h2 class="display mb-2 mt-8 font-sans text-[clamp(56px,10vw,120px)] leading-[0.86] tracking-[-0.04em]">
+        Packet<br /><span class="text-accent">Pong</span>
+      </h2>
+      <p class="mb-7 max-w-[52ch] text-muted">
+        A two-player duel, browser to browser over WebRTC. No server in the middle — just you, a friend and a
+        very small packet.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <button type="button" data-egg-host class={btnPrimary}>Host a game</button>
+        <button type="button" data-egg-go="join" class={btnGhost}>Join with a code</button>
+      </div>
+      <p class="mt-9 border-t border-rule pt-4 text-xs text-muted">
+        Ways in: type <kbd class="text-fg">play</kbd> anywhere ·
+        <kbd class="text-fg">↑ ↑ ↓ ↓ ← → ← → B A</kbd> · click “(root commit)”
+      </p>
+    </section>
+
+    <!-- 2a · Host lobby -->
+    <section data-screen="host" aria-label="Host a game" hidden>
+      <p class="mb-1.5 text-muted"><span class="text-accent">$</span> <span class={cmd}>./pong --host</span></p>
+      <p class="mb-7 text-muted">Room created. Send this code to a friend:</p>
+      <div class="mb-7 flex flex-wrap items-center gap-4">
+        <p
+          data-room-code
+          class="display border-2 border-accent px-6 py-4 font-sans text-[clamp(44px,8vw,80px)] leading-none tracking-[0.04em] text-accent"
+        >
+          ····-····
+        </p>
+        <button type="button" data-copy-link class="min-h-[48px] border-2 border-fg px-4 uppercase tracking-[0.06em] hover:bg-fg hover:text-bg">
+          Copy link
+        </button>
+        <span data-copy-feedback class="text-xs text-muted" aria-live="polite"></span>
+      </div>
+      <ol data-status-list role="list" class="mb-7 flex flex-col gap-1 text-muted" aria-live="polite"></ol>
+      <button type="button" data-mock-peer hidden class={btnPrimary}>Simulate peer joining → (mock)</button>
+    </section>
+
+    <!-- 2b · Join -->
+    <section data-screen="join" aria-label="Join a game" hidden>
+      <p class="mb-6 text-muted"><span class="text-accent">$</span> <span class={cmd}>./pong --join</span></p>
+      <form data-join-form>
+        <label for="egg-code" class="label mb-2 block text-muted">Room code</label>
+        <div class="mb-3 flex flex-wrap gap-3">
+          <input
+            id="egg-code"
+            name="code"
+            type="text"
+            required
+            placeholder="OCTO-XXXX"
+            autocomplete="off"
+            spellcheck="false"
+            class="display min-h-[56px] min-w-0 flex-[1_1_260px] border-2 border-fg bg-surface px-4 font-sans text-[32px] tracking-[0.04em] text-fg placeholder:text-muted"
+          />
+          <button type="submit" class={btnPrimary}>Connect</button>
+        </div>
+      </form>
+      <ol data-status-list role="list" class="mb-4 flex flex-col gap-1 text-muted" aria-live="polite"></ol>
+      <p class="text-xs text-muted">Codes expire after 10 minutes. Both players need to keep the tab open.</p>
+    </section>
+
+    <!-- 3 · Match -->
+    <section data-screen="match" aria-label="Match in progress" hidden>
+      <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <p class="display font-sans text-[clamp(40px,7vw,72px)] leading-[0.9]" aria-live="polite">
+          <span class="text-accent">You <span data-score-you>00</span></span>
+          <span class="mx-1 text-rule" aria-hidden="true">/</span>
+          <span data-score-peer>00</span> Peer
+        </p>
+        <p class="label text-muted">
+          p2p · webrtc · rtt <span data-rtt class="text-fg">— ms</span> · first to 7
+        </p>
+      </div>
+      <!-- Your game renders inside this element (PacketPongGame.mount). -->
+      <div data-game-root class="relative"></div>
+      <p class="label mt-3.5 text-muted">Move: W / S or ↑ / ↓ · touch: drag your side</p>
+    </section>
+
+    <!-- 4 · Result -->
+    <section data-screen="over" aria-label="Match result" hidden>
+      <p class="mb-1.5 text-muted"><span class="text-accent">$</span> <span class={cmd}>exit 0</span></p>
+      <h2 data-result-title class="display mb-1.5 mt-4 font-sans text-[clamp(56px,10vw,120px)] leading-[0.86] tracking-[-0.04em]">
+        200 <span class="text-accent">OK</span>
+      </h2>
+      <p data-result-line class="display mb-7 font-sans text-[32px]"></p>
+      <dl class="mb-8 grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] border-2 border-rule">
+        <div class="border-r border-rule p-4">
+          <dt class="label text-muted">Longest rally</dt><dd data-stat-rally class="mt-1 text-[22px]">—</dd>
+        </div>
+        <div class="border-r border-rule p-4">
+          <dt class="label text-muted">Avg rtt</dt><dd data-stat-rtt class="mt-1 text-[22px]">—</dd>
+        </div>
+        <div class="p-4">
+          <dt class="label text-muted">Packets lost</dt><dd data-stat-lost class="mt-1 text-[22px]">—</dd>
+        </div>
+      </dl>
+      <div class="flex flex-wrap gap-3">
+        <button type="button" data-egg-rematch class={btnPrimary}>Rematch</button>
+        <button type="button" data-egg-close class={btnGhost}>Back to the site</button>
+      </div>
+    </section>
+
+    <!-- Error -->
+    <section data-screen="error" aria-label="Connection problem" hidden>
+      <p class="mb-1.5 text-muted"><span class="text-accent">$</span> <span class={cmd}>echo $?</span></p>
+      <h2 class="display mb-4 mt-4 font-sans text-[clamp(48px,8vw,96px)] leading-[0.86]">
+        Exit <span class="text-accent">1</span>
+      </h2>
+      <p data-error-message class="mb-7 max-w-[56ch] text-muted" role="alert"></p>
+      <div class="flex flex-wrap gap-3">
+        <button type="button" data-egg-go="boot" class={btnPrimary}>Try again</button>
+        <button type="button" data-egg-close class={btnGhost}>Back to the site</button>
+      </div>
+    </section>
+  </div>
+</dialog>
+
+<style is:global>
+  /* The game always runs in dark mode, whatever the site theme is. */
+  .egg-dark {
+    color-scheme: dark;
+    --bg: 15 16 18;
+    --fg: 237 237 234;
+    --muted: 163 166 172;
+    --rule: 44 46 51;
+    --surface: 23 24 27;
+    --accent: 123 140 255;
+    --on-accent: 15 16 18;
+    box-shadow: 8px 8px 0 rgb(var(--accent));
+  }
+  .egg-dark::backdrop {
+    background: rgb(15 16 18 / 0.72);
+  }
+
+  /* Mock court (used by src/game/packet-pong/mock.ts). */
+  .egg-court {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border: 2px solid rgb(var(--fg));
+    overflow: hidden;
+  }
+  .egg-net {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    border-left: 2px dashed rgb(var(--rule));
+  }
+  .egg-paddle {
+    position: absolute;
+    width: 1.4%;
+    height: 22%;
+  }
+  .egg-paddle--you {
+    left: 3%;
+    background: rgb(var(--accent));
+    animation: egg-left 3.2s ease-in-out infinite;
+  }
+  .egg-paddle--peer {
+    right: 3%;
+    background: rgb(var(--fg));
+    animation: egg-right 3.2s ease-in-out infinite;
+  }
+  .egg-ball {
+    position: absolute;
+    width: 2.2%;
+    aspect-ratio: 1;
+    background: rgb(var(--fg));
+    animation: egg-ball 3.2s linear infinite;
+  }
+  .egg-mock-tag {
+    position: absolute;
+    right: 8px;
+    bottom: 6px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgb(var(--muted));
+  }
+  .egg-cursor {
+    animation: egg-blink 1s step-end infinite;
+  }
+  @keyframes egg-ball {
+    0%, 100% { left: 6%; top: 22%; }
+    22% { left: 48%; top: 86%; }
+    48% { left: 92%; top: 36%; }
+    74% { left: 50%; top: 6%; }
+  }
+  @keyframes egg-left {
+    0%, 100% { top: 10%; }
+    50% { top: 52%; }
+  }
+  @keyframes egg-right {
+    0%, 100% { top: 46%; }
+    50% { top: 16%; }
+  }
+  @keyframes egg-blink {
+    50% { opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .egg-paddle, .egg-ball, .egg-cursor { animation: none; }
+  }
+</style>
+
+<script>
+  import { createGame, type EggEvent, type PacketPongGame } from "@/game/packet-pong";
+  import { createMockGame, simulatePeerJoin } from "@/game/packet-pong/mock";
+
+  const dialog = document.querySelector<HTMLDialogElement>("[data-egg]");
+
+  if (dialog) {
+    const $ = <T extends Element = HTMLElement>(sel: string) => dialog.querySelector<T>(sel)!;
+    const $$ = <T extends Element = HTMLElement>(sel: string) => [...dialog.querySelectorAll<T>(sel)];
+
+    const screens = $$<HTMLElement>("[data-screen]");
+    const gameRoot = $("[data-game-root]");
+    const codeInput = $<HTMLInputElement>("#egg-code");
+    const mockPeerButton = $<HTMLButtonElement>("[data-mock-peer]");
+    const pad = (n: number) => String(n).padStart(2, "0");
+
+    let game: PacketPongGame | null = null;
+    let emit: (e: EggEvent) => void = () => {};
+    let roomCode = "";
+
+    // ── Screens ────────────────────────────────────────────────────────────
+    const show = (name: string) => {
+      screens.forEach((s) => (s.hidden = s.dataset.screen !== name));
+      const current = screens.find((s) => s.dataset.screen === name);
+      current?.querySelector<HTMLElement>("input, button")?.focus();
+    };
+
+    const resetStatus = () => $$("[data-status-list]").forEach((list) => (list.innerHTML = ""));
+
+    const addStatus = (text: string, done = false) => {
+      $$("[data-status-list]").forEach((list) => {
+        list.querySelector("[data-pending]")?.remove();
+        const li = document.createElement("li");
+        if (!done) li.dataset.pending = "";
+        li.innerHTML = done
+          ? `<span class="text-[#3DDC97]">✓</span> `
+          : `<span class="text-accent">…</span> `;
+        li.append(text);
+        if (!done) li.insertAdjacentHTML("beforeend", ` <span class="egg-cursor text-fg" aria-hidden="true">▍</span>`);
+        list.append(li);
+      });
+    };
+
+    // ── Game lifecycle ─────────────────────────────────────────────────────
+    const newGame = () => {
+      game?.destroy();
+      const real = createGame();
+      const instance = real ?? createMockGame();
+      game = instance;
+      mockPeerButton.hidden = real !== null;
+      resetStatus();
+      gameRoot.innerHTML = "";
+
+      // Events from a destroyed/replaced game are ignored.
+      emit = (event) => {
+        if (game !== instance) return;
+        handle(event);
+      };
+    };
+
+    const handle = (event: EggEvent) => {
+      switch (event.type) {
+        case "room":
+          roomCode = event.code;
+          $("[data-room-code]").textContent = event.code;
+          break;
+        case "status":
+          addStatus(event.text, event.done);
+          break;
+        case "connected":
+          show("match");
+          $("[data-score-you]").textContent = "00";
+          $("[data-score-peer]").textContent = "00";
+          gameRoot.innerHTML = "";
+          game?.mount(gameRoot);
+          break;
+        case "rtt":
+          $("[data-rtt]").textContent = `${Math.round(event.ms)} ms`;
+          break;
+        case "score":
+          $("[data-score-you]").textContent = pad(event.you);
+          $("[data-score-peer]").textContent = pad(event.peer);
+          break;
+        case "over": {
+          const won = event.you > event.peer;
+          $("[data-result-title]").innerHTML = won
+            ? `200 <span class="text-accent">OK</span>`
+            : `418 <span class="text-accent">Teapot</span>`;
+          $("[data-result-line]").textContent = `You ${pad(event.you)} / ${pad(event.peer)} Peer — ${won ? "you win" : "you lose"}`;
+          $("[data-stat-rally]").textContent = `${event.stats.longestRally} hits`;
+          $("[data-stat-rtt]").textContent = `${Math.round(event.stats.avgRttMs)} ms`;
+          $("[data-stat-lost]").textContent = String(event.stats.packetsLost);
+          show("over");
+          break;
+        }
+        case "error":
+          $("[data-error-message]").textContent = event.message;
+          show("error");
+          break;
+      }
+    };
+
+    // ── Open / close ───────────────────────────────────────────────────────
+    const open = (joinCode?: string) => {
+      if (!dialog.open) dialog.showModal();
+      newGame();
+      if (joinCode !== undefined) {
+        codeInput.value = joinCode;
+        show("join");
+      } else {
+        show("boot");
+      }
+    };
+
+    dialog.addEventListener("close", () => {
+      game?.destroy();
+      game = null;
+      if (location.hash.startsWith("#play")) history.replaceState(null, "", location.pathname + location.search);
+    });
+
+    // ── Buttons inside the overlay ─────────────────────────────────────────
+    dialog.addEventListener("click", (e) => {
+      const target = (e.target as HTMLElement).closest<HTMLElement>("button");
+      if (!target) return;
+      if (target.matches("[data-egg-close]")) dialog.close();
+      else if (target.matches("[data-egg-host]")) {
+        newGame();
+        $("[data-room-code]").textContent = "····-····";
+        $("[data-copy-feedback]").textContent = "";
+        show("host");
+        game?.host(emit);
+      } else if (target.dataset.eggGo) {
+        newGame();
+        show(target.dataset.eggGo);
+      } else if (target.matches("[data-mock-peer]")) simulatePeerJoin(emit);
+      else if (target.matches("[data-egg-rematch]")) {
+        show("match");
+        game?.rematch();
+      } else if (target.matches("[data-copy-link]") && roomCode) {
+        const link = `${location.origin}/#play=${roomCode}`;
+        navigator.clipboard
+          ?.writeText(link)
+          .then(() => ($("[data-copy-feedback]").textContent = "Copied!"))
+          .catch(() => ($("[data-copy-feedback]").textContent = link));
+      }
+    });
+
+    $<HTMLFormElement>("[data-join-form]").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const code = codeInput.value.trim().toUpperCase();
+      if (!code) return;
+      resetStatus();
+      game?.join(code, emit);
+    });
+
+    // ── Ways in ────────────────────────────────────────────────────────────
+    // 1. Any [data-egg-open] element, e.g. "(root commit)" on the home page.
+    document.addEventListener("click", (e) => {
+      if ((e.target as HTMLElement).closest("[data-egg-open]")) open();
+    });
+
+    // 2. Typing "play", or the Konami code, outside of form fields.
+    const SECRETS = [
+      ["p", "l", "a", "y"],
+      ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "b", "a"],
+    ];
+    const recent: string[] = [];
+    document.addEventListener("keydown", (e) => {
+      if (dialog.open || e.metaKey || e.ctrlKey || e.altKey) return;
+      const el = e.target as HTMLElement;
+      if (el.closest("input, textarea, select, [contenteditable='true']")) return;
+      recent.push(e.key.toLowerCase());
+      if (recent.length > 10) recent.shift();
+      const hit = SECRETS.some((seq) => seq.every((key, i) => recent[recent.length - seq.length + i] === key));
+      if (hit) {
+        recent.length = 0;
+        open();
+      }
+    });
+
+    // 3. Links: /#play opens the egg, /#play=OCTO-4F2A opens Join with the code.
+    const fromHash = () => {
+      const match = location.hash.match(/^#play(?:=([\w-]+))?$/i);
+      if (match) open(match[1]?.toUpperCase());
+    };
+    window.addEventListener("hashchange", fromHash);
+    fromHash();
+  }
+</script>
