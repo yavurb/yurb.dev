@@ -1,3 +1,5 @@
+import roy from "@/assets/roy.jpg";
+
 /**
  * Content for /whoami and the home teaser.
  * Filled from Roy's LinkedIn profile. Anything still in [brackets] wasn't
@@ -118,7 +120,7 @@ const whoami: Whoami = {
   offTheClock:
     "[A few lines that aren’t about code — hobbies, places, what you’re reading.]",
   cvUrl: "",
-  photo: null,
+  photo: roy,
 };
 
 export default whoami;
