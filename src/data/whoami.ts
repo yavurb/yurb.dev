@@ -58,7 +58,7 @@ const whoami: Whoami = {
       summary: "Lead Zumma’s engineering team — and still build critical components and new features myself.",
       highlights: [
         "Guide the planning and development of Zumma’s AI processes and AI agents",
-        "Act as the face of Zumma’s engineering with clients and partners",
+        "Own the technical relationship with clients and partners",
         "Define our engineering processes, the scope of new work and its priorities",
         "Shape where Zumma’s engineering goes next — and build it",
       ],
