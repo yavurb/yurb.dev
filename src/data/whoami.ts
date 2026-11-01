@@ -8,6 +8,8 @@ type Role = {
   period: string; // e.g. "Mar 2023 — now · Mexico City"
   title: string; // e.g. "Head of Engineering @ Zumma"
   summary: string;
+  /** Optional bullets under the summary. */
+  highlights?: string[];
   tags: string[];
 };
 
@@ -44,26 +46,30 @@ const whoami: Whoami = {
   now: [
     {
       label: "Working on",
-      value: "Leading engineering at Zumma — AI agents that automate financial workflows.",
+      value: "Leading a team of five at Zumma — and the AI agents behind our financial workflows.",
     },
     { label: "Building", value: "Rill, Yurback, and this site — [anything else on the bench]." },
     { label: "Studying", value: "Wrapping up a BSc in Computer Science at University of the People." },
   ],
   roles: [
     {
-      // TODO(roy): the month you became Head of Engineering.
-      period: "[Month Year] — now · Promoted · Mexico City",
+      period: "Nov 2025 — now · Promoted · Mexico City",
       title: "Head of Engineering @ Zumma",
-      summary:
-        "Leading engineering. Led Mexico’s first automated invoicing AI agent, scalable AI expense management for 100,000+ customers, and an image-processing pipeline for critical data extraction.",
-      tags: ["python", "go", "ai-agents", "whatsapp-api"],
+      summary: "Lead a team of five — and still build critical components and new features myself.",
+      highlights: [
+        "Guide the planning and development of Zumma’s AI processes and AI agents",
+        "Lead every technical meeting with clients",
+        "Define our engineering processes, the scope of new work and its priorities",
+        "Shape where Zumma’s engineering goes next — and build it",
+      ],
+      tags: ["ai-agents", "leadership", "python", "go"],
     },
     {
-      period: "Mar 2023 — [Month Year] · Mexico City",
+      period: "Mar 2023 — Nov 2025 · Mexico City",
       title: "Founding Engineer @ Zumma",
       summary:
-        "Joined as the founding backend engineer. [What you built in this stage — e.g. the first version of the platform.]",
-      tags: ["backend", "python", "go"],
+        "Joined as the founding backend engineer. Architected and built Zumma’s main product, Facturación de Gastos en Automático (automatic expense invoicing), now serving 100,000+ customers — including the extraction pipeline that pulls the data needed to request and issue each invoice on the merchant’s portal.",
+      tags: ["backend", "python", "go", "data-extraction"],
     },
     {
       period: "Mar 2021 — Mar 2023 · Caracas",

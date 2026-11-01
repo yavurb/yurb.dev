@@ -103,6 +103,16 @@ import whoami from "@/data/whoami";
             <div class="mb-5 border-b border-rule pb-7 pt-2.5">
               <h3 class="display text-[clamp(28px,4vw,36px)] leading-none">{role.title}</h3>
               <p class="mb-2.5 mt-2 max-w-[60ch] text-muted">{role.summary}</p>
+              {role.highlights && role.highlights.length > 0 && (
+                <ul role="list" class="mb-3 max-w-[60ch] space-y-1.5 text-muted">
+                  {role.highlights.map((item) => (
+                    <li class="flex gap-3">
+                      <span aria-hidden="true" class="mt-[0.6em] h-1.5 w-1.5 shrink-0 bg-accent" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
               <p class="label text-muted">{role.tags.map((t) => `+${t}`).join(" ")}</p>
             </div>
           </li>
